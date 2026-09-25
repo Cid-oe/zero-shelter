@@ -15,6 +15,7 @@ import {
   overridesField,
   type PackageManager,
 } from "./package-manager.js";
+import type { Messages } from './messages.js';
 import type { JudgeResult } from "./report.js";
 import { WEIGHTS, type Reason } from "./triage.js";
 import { type Language, messagesFor } from "./messages.js";
