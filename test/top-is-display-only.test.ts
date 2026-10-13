@@ -10,6 +10,7 @@ import { emptyBaseline } from "../src/baseline.js";
 import { judge } from "../src/judge.js";
 import { parseNpmAudit } from "../src/ingest/npm-audit.js";
 import { renderHuman, renderJson } from "../src/report.js";
+import { renderSarif } from "../src/sarif.js";
 
 const findings = parseNpmAudit(
   readFileSync(fileURLToPath(new URL("./fixtures/npm-audit.json", import.meta.url)), "utf8"),
@@ -63,6 +64,21 @@ describe("possibleDuplicates truncation", () => {
     for (const row of json.fixNow) {
       for (const dup of row.possibleDuplicates) {
         expect(returnedFingerprints.has(dup)).toBe(true);
+      }
+    }
+  });
+
+  it("drops possibleDuplicates references outside the SARIF result set", () => {
+    const sarif = JSON.parse(renderSarif(capped));
+    const returnedFingerprints = new Set(
+      sarif.runs[0].results.map((entry: { partialFingerprints: { zeroShelter: string } }) =>
+        entry.partialFingerprints.zeroShelter,
+      ),
+    );
+
+    for (const entry of sarif.runs[0].results) {
+      for (const duplicate of entry.properties.possibleDuplicates) {
+        expect(returnedFingerprints.has(duplicate)).toBe(true);
       }
     }
   });
