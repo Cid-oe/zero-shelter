@@ -271,6 +271,13 @@ would take that away.
 --help                print this help
 ```
 
+A successfully parsed `--input` report contributes its source even when it
+contains zero findings. This applies to npm audit (current and legacy shapes)
+and OSV reports, including mixed and repeated inputs. The source set is kept
+in report qualifications and `--record` history. It identifies the supplied
+report's format; it does not prove when or where that report was produced.
+Malformed inputs still fail before a judgment or history entry is written.
+
 `--no-color` affects human-readable text only and overrides `FORCE_COLOR`.
 The existing `NO_COLOR` environment variable remains supported.
 
@@ -281,8 +288,10 @@ runs. Nothing is recorded unless `judge --record` is requested.
 
 `zero-shelter why <package>` reads the local npm lockfile and prints every path
 from a direct dependency to each installed copy of that package. It also shows
-fixed-version context from scanner output when available. Pass `--input` one or
-more times for an offline, repeatable report; without it, the existing scanners
+fixed-version context from scanner output when available. Paths with identical
+package names, versions, and requested ranges appear once; different versions or
+ranges remain separate. Pass `--input` one or more times for an offline,
+repeatable report; without it, the existing scanners
 are collected like `judge` and keep their existing subprocess/network boundary.
 The command never installs packages or adds a registry lookup of its own, and it
 reports only versions the lockfile can establish.
